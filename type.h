@@ -31,11 +31,10 @@ typedef enum {
     IOT_LP_TEMPERATURE_F        = 12U, // Temperature Fahrenheit, Size: 2 Bytes
     IOT_LP_TEMPERATURE_K        = 13U, // Temperature Kelvin, Size: 2 Bytes
 
-    IOT_LP_PRESSURE             = 12U, // Pressure Pascals, Size: 2 Bytes
-    IOT_LP_BAROMETRIC_PRESSURE  = 13U, // Pressure Torr, Size: 2 Bytes
+    IOT_LP_BAROMETRIC_PRESSURE  = 14U, // Pressure hPa, Size: 4 Bytes
 
-    IOT_LP_RELATIVE_HUMIDITY    = 14U, // Relative Humidity Percentage, 2 Bytes
-    IOT_LP_ABSOLUTE_HUMIDITY    = 15U, // Absolute Humidity g/M^3, 2 Bytes
+    IOT_LP_RELATIVE_HUMIDITY    = 15U, // Relative Humidity Percentage, 2 Bytes
+    IOT_LP_ABSOLUTE_HUMIDITY    = 16U, // Absolute Humidity g/M^3, 2 Bytes
 
     IOT_LP_GAS_PPB              = 12U, // Parts per Billion of Gas, 2 Bytes
     IOT_LP_GAS_PPM              = 13U, // Parts per Million of Gas, 2 Bytes

@@ -7,17 +7,90 @@ void iot_lp_add_init(iot_lp_payload *payload) {
 
 void iot_lp_dump_hex(iot_lp_payload *payload, char *payload_hex) {
 
-    char tmp_hex[5] = {'\0'};
-
     char *position = payload_hex;
 
     for(uint8_t i=0; i<=(payload->position-1); i++) {
 
         /*if (i) {
-            pos += sprintf(position, " ");
+            position += sprintf(position, " ");
         }*/
 
         position += sprintf(position, "%02x", payload->data[i]);
+    }
+}
+
+void iot_lp_print_payload(iot_lp_payload *payload) {
+
+    char print_str[512];
+
+    char *position = print_str;
+
+    position += sprintf(position, "|  Port  |  Type  |  Data \n");
+
+    for(uint8_t i=0; i<=(payload->position-1); i++) {
+
+        position += sprintf(position, "|  ");
+
+        uint8_t port = payload->data[i];
+        position += sprintf(position, "0x%02x", payload->data[i]);
+        i++;
+
+        position += sprintf(position, "  |  ");
+
+        uint8_t type = payload->data[i];
+        position += sprintf(position, "0x%02x", payload->data[i]);
+
+        position += sprintf(position, "  |  ");
+
+        for(uint8_t k=0; k<=(iot_lp_get_data_size(type)-1); k++) {
+            i++;
+            position += sprintf(position, "0x%02x", payload->data[i]);
+            position += sprintf(position, " ");
+        }
+
+        position += sprintf(position, " \n");
+
+    }
+
+    printf(print_str);
+}
+
+uint8_t iot_lp_get_data_size(iot_lp_data_type type) {
+
+    switch (type) {
+
+        case IOT_LP_INT_8B:
+            return IOT_LP_DECIMAL_8B_SIZE;
+        case IOT_LP_INT_16B:
+            return IOT_LP_DECIMAL_16B_SIZE;
+        case IOT_LP_INT_32B:
+            return IOT_LP_DECIMAL_32B_SIZE;
+        case IOT_LP_INT_64B:
+            return IOT_LP_DECIMAL_64B_SIZE;
+
+        case IOT_LP_UINT_8B:
+            return IOT_LP_DECIMAL_8B_SIZE;
+        case IOT_LP_UINT_16B:
+            return IOT_LP_DECIMAL_16B_SIZE;
+        case IOT_LP_UINT_32B:
+            return IOT_LP_DECIMAL_32B_SIZE;
+        case IOT_LP_UINT_64B:
+            return IOT_LP_DECIMAL_64B_SIZE;
+
+        case IOT_LP_FLOAT:
+            return IOT_LP_FLOAT_SIZE;
+        case IOT_LP_DOUBLE:
+            return IOT_LP_DOUBLE_SIZE;
+
+        case IOT_LP_DIGITAL:
+            return IOT_LP_DECIMAL_8B_SIZE;
+
+        case IOT_LP_TEMPERATURE_C:
+            return IOT_LP_DECIMAL_16B_SIZE;
+        case IOT_LP_TEMPERATURE_F:
+            return IOT_LP_DECIMAL_16B_SIZE;
+        case IOT_LP_TEMPERATURE_K:
+            return IOT_LP_DECIMAL_16B_SIZE;
     }
 }
 
@@ -38,6 +111,14 @@ void iot_lp_payload_add(iot_lp_payload *payload, iot_lp_data_type data_type, uin
     }
 }
 
+void _iot_lp_add_8B(iot_lp_payload *payload, uint8_t port, iot_lp_data_type type, int16_t value) {
+
+    uint8_t bytes[IOT_LP_DECIMAL_8B_SIZE];
+    bytes[0] = value;
+
+    iot_lp_payload_add(payload, type, port, IOT_LP_DECIMAL_8B_SIZE, bytes);
+}
+
 void _iot_lp_add_16B(iot_lp_payload *payload, uint8_t port, iot_lp_data_type type, int16_t value) {
 
     uint8_t bytes[IOT_LP_DECIMAL_16B_SIZE];
@@ -45,6 +126,32 @@ void _iot_lp_add_16B(iot_lp_payload *payload, uint8_t port, iot_lp_data_type typ
     bytes[1] = value        & 0xFF;
 
     iot_lp_payload_add(payload, type, port, IOT_LP_DECIMAL_16B_SIZE, bytes);
+}
+
+void _iot_lp_add_32B(iot_lp_payload *payload, uint8_t port, iot_lp_data_type type, int32_t value) {
+
+    uint8_t bytes[IOT_LP_DECIMAL_32B_SIZE];
+    bytes[0] = (value >> 24) & 0xFF;
+    bytes[1] = (value >> 16) & 0xFF;
+    bytes[2] = (value >> 8)  & 0xFF;
+    bytes[3] = value         & 0xFF;
+
+    iot_lp_payload_add(payload, type, port, IOT_LP_DECIMAL_32B_SIZE, bytes);
+}
+
+void _iot_lp_add_64B(iot_lp_payload *payload, uint8_t port, iot_lp_data_type type, int64_t value) {
+
+    uint8_t bytes[IOT_LP_DECIMAL_64B_SIZE];
+    bytes[0] = (value >> 56) & 0xFF;
+    bytes[1] = (value >> 48) & 0xFF;
+    bytes[2] = (value >> 40) & 0xFF;
+    bytes[3] = (value >> 32) & 0xFF;
+    bytes[4] = (value >> 24) & 0xFF;
+    bytes[5] = (value >> 16) & 0xFF;
+    bytes[6] = (value >> 8)  & 0xFF;
+    bytes[7] = value         & 0xFF;
+
+    iot_lp_payload_add(payload, type, port, IOT_LP_DECIMAL_64B_SIZE, bytes);
 }
 
 void iot_lp_add_int8(iot_lp_payload *payload, uint8_t port, int8_t value) {
@@ -212,4 +319,11 @@ void iot_lp_add_temperature_k(iot_lp_payload *payload, uint8_t port, float tempe
     // Temp K will be stored in int format, save 2 decimal places
     temperature *= 100;
     _iot_lp_add_16B(payload, port, IOT_LP_TEMPERATURE_K, temperature);
+}
+
+void iot_lp_add_barometric_pressure(iot_lp_payload *payload, uint8_t port, float pressure) {
+
+    // Pressure will be stored as int with 2 decimal places
+    pressure *= 100;
+    _iot_lp_add_32B(payload, port, IOT_LP_BAROMETRIC_PRESSURE, pressure);
 }

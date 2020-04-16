@@ -11,7 +11,7 @@ int main() {
 
     //iot_lp_add_uint8(&payload, 2, 16);
     //iot_lp_add_uint16(&payload, 2, 290);
-    //iot_lp_add_uint32(&payload, 2, 290);
+    //iot_lp_add_uint32(&payload, 68, 290);
     //iot_lp_add_uint64(&payload, 2, 2255890);
 
     //iot_lp_add_int64(&payload, 2, 2255890);
@@ -23,9 +23,13 @@ int main() {
     //iot_lp_add_temperature_f(&payload, 2, -160.43);
     //iot_lp_add_temperature_k(&payload, 2, 356.43);
 
+    iot_lp_add_barometric_pressure(&payload, 1, 1052.64);
+
     iot_lp_dump_hex(&payload, payload_str);
 
     printf("Payload: %s Position: %d\n", payload_str, payload.position);
+
+    iot_lp_print_payload(&payload);
 
     return 0;
 }
