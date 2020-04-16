@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/frazer/CLionProjects/iot-lightweight-payload/main.c
+stdio.h
+-
+payload.h
+/home/frazer/CLionProjects/iot-lightweight-payload/payload.h
+
+/home/frazer/CLionProjects/iot-lightweight-payload/payload.c
+payload.h
+/home/frazer/CLionProjects/iot-lightweight-payload/payload.h
+
+/home/frazer/CLionProjects/iot-lightweight-payload/payload.h
+stdint.h
+-
+stdio.h
+-
+type.h
+/home/frazer/CLionProjects/iot-lightweight-payload/type.h
+
+/home/frazer/CLionProjects/iot-lightweight-payload/type.h
+
